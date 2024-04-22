@@ -19,7 +19,6 @@ def send_code(request):
     if error_response:
         return error_response
 
-    # Имитация отправки кода
     time.sleep(2)
     auth_code = ''.join(random.choices('0123456789', k=4))
 
