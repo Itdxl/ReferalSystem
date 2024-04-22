@@ -4,15 +4,13 @@ import time
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import AccessToken
-
-
 
 from .models import CustomUser
 from .serializers import CustomUserSerializer
 
 
 def check_required_fields(request, fields):
+    # Проверка обязательных полей
     for field in fields:
         if not request.data.get(field):
             return Response({'error': f'{field} is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -28,16 +26,14 @@ def send_code(request):
     time.sleep(2)
     auth_code = ''.join(random.choices('0123456789', k=4))
 
-    # Создание пользователя или обновление существующего
     user, created = CustomUser.objects.get_or_create(phone_number=request.data.get('phone_number'))
-    user.is_authenticated = False  # Пользователь авторизуется с помощью кода
+    user.is_authenticated = False  # True, когда введет код
     user.save()
 
-    # Сохранение кода аутентификации в объект пользователя
     user.authorization_code = auth_code
     user.save()
-
     return Response({'authorization_code': auth_code}, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 def verify_code(request):
@@ -53,17 +49,13 @@ def verify_code(request):
     if user.is_authenticated:
         return Response({'error': 'User already authenticated'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Проверка кода аутентификации
     received_code = request.data.get('authorization_code')
     if received_code != user.authorization_code:
-        return Response({'error': 'Invalid authorization code'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Invalid code'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Пользователь успешно аутентифицирован
     user.is_authenticated = True
     user.save()
-    token = AccessToken.for_user(user)
-
-    return Response({'message': 'User authenticated successfully', 'token': str(token)}, status=status.HTTP_200_OK)
+    return Response({'message': 'Authenticated successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST'])
@@ -74,7 +66,7 @@ def profile(request):
     try:
         profile = CustomUser.objects.get(phone_number=request.data.get('phone_number'))
     except CustomUser.DoesNotExist:
-        return Response({'error': 'User profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = CustomUserSerializer(profile)
@@ -82,13 +74,11 @@ def profile(request):
 
     elif request.method == 'POST':
         # Проверяем, что инвайт код еще не добавлен
-        if profile.invite_code:
-            return Response({'error': 'Invite code already set'}, status=status.HTTP_400_BAD_REQUEST)
-
         invite_code = request.data.get('invite_code')
+        if profile.invite_code:
+            return Response({'error': 'Invite code already added'}, status=status.HTTP_400_BAD_REQUEST)
         if not invite_code:
             return Response({'error': 'Invite code is required'}, status=status.HTTP_400_BAD_REQUEST)
-
         return activate_invite_code(profile, invite_code)
 
 
@@ -100,22 +90,17 @@ def activate_invite_code(profile, invite_code):
         return Response({'error': 'Invalid invite code'}, status=status.HTTP_400_BAD_REQUEST)
     profile.inviter = inviter
     profile.save()
-    return Response({'message': 'Invite code activated successfully'}, status=status.HTTP_200_OK)
+    return Response({'message': 'Invite code added successfully'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def invites_counter(request):
-    # Получение текущего пользователя по его телефонному номеру
     try:
         user = CustomUser.objects.get(phone_number=request.data.get('phone_number'))
     except CustomUser.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    # Получение всех пользователей, которых текущий пользователь пригласил
-    invitees = user.invitees.all()
-
+    # Получение всех, кого пользователь пригласил
+    invited = user.invitees.all()
     # Получение списка номеров телефонов приглашенных пользователей
-    invited_users_phones = [invitee.phone_number for invitee in invitees]
-
-    # Возвращаем список номеров телефонов приглашенных пользователей
+    invited_users_phones = [invitee.phone_number for invitee in invited]
     return Response({'invited_users': invited_users_phones}, status=status.HTTP_200_OK)

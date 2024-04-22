@@ -11,12 +11,11 @@ class CustomUser(AbstractBaseUser):
     is_authenticated = models.BooleanField(default=False) # для проверки кода
     inviter = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='invitees')
 
-
     def __str__(self):
         return self.phone_number
 
     def save(self, *args, **kwargs):
-        # Генерация и сохранение уникального инвайт-кода при первой авторизации
+        # Генерация и сохранение инвайт-кода
         if not self.pk and not self.invite_code:
             self.invite_code = self.generate_code()
         super().save(*args, **kwargs)
