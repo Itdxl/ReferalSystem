@@ -39,26 +39,23 @@
 1. **Клонирование репозитория**:
    ```bash
    git clone https://github.com/your-repository.git
-2. **Установка зависимостей**:
+2. **Установка зависимостей. Пример:**:
    ```bash
-   cd your-project-directory
+   cd your-project
    pip install -r requirements.txt
-
-4. **Настройка переменных окружения: Создайте файл .env в корневой директории проекта и добавьте необходимые переменные окружения. Пример:**:
+3. **Настройка переменных окружения: Создайте файл .env в корневой директории проекта и добавьте необходимые переменные окружения. Пример:**:
    ```env
    POSTGRES_USER=your_postgres_user
    POSTGRES_PASSWORD=your_postgres_password
    POSTGRES_DB=your_postgres_db
-5. **Применение миграций**:
+4. **Применение миграций**:
    ```bash
    python manage.py migrate
-6. **Создание суперпользователя**:
+5. **Создание суперпользователя**:
    ```bash
    python manage.py createsuperuser
 
-7. **Запуск проекта**:
+6. **Запуск проекта**:
    ```bash
    python manage.py runserver
-8. **Установка зависимостей**:
-   cd your-project-directory
-   pip install -r requirements.txt
+
