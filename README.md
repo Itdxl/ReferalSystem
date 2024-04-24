@@ -31,3 +31,32 @@
 
 6. **Redoc**:
    - Этот эндпоинт предоставляет интерфейс Redoc для документации API.
+
+
+
+## Развертывание проекта
+
+1. **Клонирование репозитория**:
+   ```bash
+   git clone https://github.com/your-repository.git
+2. **Установка зависимостей**:
+   cd your-project-directory
+   pip install -r requirements.txt
+
+3. **Настройка переменных окружения: Создайте файл .env в корневой директории проекта и добавьте необходимые переменные окружения. Пример:**:
+   POSTGRES_USER=your_postgres_user
+   POSTGRES_PASSWORD=your_postgres_password
+   POSTGRES_DB=your_postgres_db
+4. **Применение миграций**:
+   ```bash
+   python manage.py migrate
+5. **Создание суперпользователя**:
+   ```bash
+   python manage.py createsuperuser
+
+7. **Запуск проекта**:
+   ```bash
+   python manage.py runserver
+8. **Установка зависимостей**:
+   cd your-project-directory
+   pip install -r requirements.txt
