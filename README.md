@@ -38,7 +38,7 @@
 
 1. **Клонирование репозитория**:
    ```bash
-   git clone https://github.com/your-repository.git
+   git clone https://github.com/Itdxl/ReferalSystem.git
 2. **Установка зависимостей. Пример:**:
    ```bash
    cd your-project
